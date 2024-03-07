@@ -1,6 +1,5 @@
-// Task.jsx
-import { useState } from "react";
-import { Box, Text, IconButton, Input, Button } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, Text, IconButton, Input, Button, Select } from "@chakra-ui/react";
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 
 const Task = ({ task, onDelete, onUpdate }) => {
@@ -8,6 +7,7 @@ const Task = ({ task, onDelete, onUpdate }) => {
   const [editedTitle, setEditedTitle] = useState(task.title);
   const [editedDescription, setEditedDescription] = useState(task.description);
   const [editedDueDate, setEditedDueDate] = useState(task.dueDate);
+  const [editedStatus, setEditedStatus] = useState(task.status);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -19,6 +19,7 @@ const Task = ({ task, onDelete, onUpdate }) => {
       title: editedTitle,
       description: editedDescription,
       dueDate: editedDueDate,
+      status: editedStatus,
     });
     setIsEditing(false);
   };
@@ -54,9 +55,20 @@ const Task = ({ task, onDelete, onUpdate }) => {
             type="date"
             value={editedDueDate}
             onChange={(e) => setEditedDueDate(e.target.value)}
-            mb={4}
+            mb={2}
             variant="flushed"
           />
+          <Select
+            value={editedStatus}
+            onChange={(e) => setEditedStatus(e.target.value)}
+            mb={2}
+            variant="flushed"
+            disabled
+          >
+            <option value="todo">To Do</option>
+            <option value="inProgress">In Progress</option>
+            <option value="done">Done</option>
+          </Select>
           <Button colorScheme="teal" size="sm" onClick={handleSaveClick}>
             Save
           </Button>
@@ -71,6 +83,9 @@ const Task = ({ task, onDelete, onUpdate }) => {
           </Text>
           <Text fontSize="sm" fontStyle="italic" color="gray.500" mb={2}>
             Due Date: {task.dueDate}
+          </Text>
+          <Text fontSize="sm" fontStyle="italic" color="gray.500" mb={2}>
+            Status: {task.status}
           </Text>
           <IconButton
             aria-label="Edit Task"
