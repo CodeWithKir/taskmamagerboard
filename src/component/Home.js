@@ -1,4 +1,3 @@
-// Home.jsx
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import TaskForm from "./TaskForm";
@@ -54,7 +53,10 @@ export const Home = () => {
       const finishTasks = [...finishColumn];
 
       const [removed] = startTasks.splice(source.index, 1);
-      finishTasks.splice(destination.index, 0, removed);
+      finishTasks.splice(destination.index, 0, {
+        ...removed,
+        status: destination.droppableId,
+      });
 
       setTasks({
         ...tasks,
@@ -64,17 +66,18 @@ export const Home = () => {
     }
   };
 
-  const addTask = (title, description, dueDate) => {
+  const addTask = (title, description, dueDate, status) => {
     const newTask = {
       id: uuid(),
       title,
       description,
       dueDate,
+      status,
     };
 
     setTasks((prevTasks) => ({
       ...prevTasks,
-      [COLUMN_IDS.TODO]: [...prevTasks[COLUMN_IDS.TODO], newTask],
+      [status]: [...prevTasks[status], newTask],
     }));
   };
 
@@ -102,79 +105,78 @@ export const Home = () => {
   };
 
   const bgColor = useColorModeValue("gray.100", "gray.700");
-const getColumnTitle = (columnId) => {
-  switch (columnId) {
-    case COLUMN_IDS.TODO:
-      return "To Do";
-    case COLUMN_IDS.IN_PROGRESS:
-      return "In Progress";
-    case COLUMN_IDS.DONE:
-      return "Done";
-    default:
-      return "";
-  }}
+
+  const getColumnTitle = (columnId) => {
+    switch (columnId) {
+      case COLUMN_IDS.TODO:
+        return "To Do";
+      case COLUMN_IDS.IN_PROGRESS:
+        return "In Progress";
+      case COLUMN_IDS.DONE:
+        return "Done";
+      default:
+        return "";
+    }
+  };
+
   return (
     <Flex direction="column" align="center" p={4} bg={useColorModeValue("gray.50", "gray.800")}>
       <Box mb={4}>
         <TaskForm onAddTask={addTask} />
       </Box>
       <DragDropContext onDragEnd={onDragEnd}>
-  <Flex justify="center" w="100%">
-    {Object.keys(tasks).map((columnId) => (
-      <Box
-        key={columnId}
-        mx={4}
-        bg={bgColor}
-        p={4}
-        borderRadius="md"
-        boxShadow="md"
-        borderWidth="1px"
-        borderColor="gray.200"
-        w={{ base: "100%", md: "100%", lg: "100%" }}
-      >
-        <VStack spacing={4} w="100%">
-          <Box fontWeight="bold" fontSize="lg" mb={2}>
-            {getColumnTitle(columnId)}
-          </Box>
-          <Droppable droppableId={columnId} key={columnId}>
-            {(provided) => (
-              <VStack
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                spacing={4}
-                w="100%"
-              >
-                {tasks[columnId].map((task, index) => (
-                  <Draggable
-                    key={task.id}
-                    draggableId={task.id}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <Box
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        w="100%"
-                      >
-                        <Task
-                          task={task}
-                          onDelete={() => deleteTask(task.id)}
-                          onUpdate={updateTask}
-                        />
-                      </Box>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
+        <Flex justify="center" w="100%">
+          {Object.keys(tasks).map((columnId) => (
+            <Box
+              key={columnId}
+              mx={4}
+              bg={bgColor}
+              p={4}
+              borderRadius="md"
+              boxShadow="md"
+              borderWidth="1px"
+              borderColor="gray.200"
+              w={{ base: "100%", md: "100%", lg: "100%" }}
+            >
+              <VStack spacing={4} w="100%">
+                <Box fontWeight="bold" fontSize="lg" mb={2}>
+                  {getColumnTitle(columnId)}
+                </Box>
+                <Droppable droppableId={columnId} key={columnId}>
+                  {(provided) => (
+                    <VStack
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      spacing={4}
+                      w="100%"
+                    >
+                      {tasks[columnId].map((task, index) => (
+                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                          {(provided) => (
+                            <Box
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              w="100%"
+                            >
+                              <Task
+                                task={task}
+                                onDelete={() => deleteTask(task.id)}
+                                onUpdate={updateTask}
+                              />
+                            </Box>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </VStack>
+                  )}
+                </Droppable>
               </VStack>
-            )}
-          </Droppable>
-        </VStack>
-      </Box>
-    ))}
-  </Flex>
-</DragDropContext>;
+            </Box>
+          ))}
+        </Flex>
+      </DragDropContext>
     </Flex>
   );
 };
