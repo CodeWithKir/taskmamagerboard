@@ -1,19 +1,20 @@
-// TaskForm.jsx
-import { useState } from "react";
-import { Box, Button, Flex, FormControl, FormLabel, Input } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, Button, Flex, FormControl, FormLabel, Input, Select } from "@chakra-ui/react";
 
 const TaskForm = ({ onAddTask }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [status, setStatus] = useState("todo");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim() || !description.trim() || !dueDate.trim()) return;
-    onAddTask(title, description, dueDate);
+    onAddTask(title, description, dueDate, status);
     setTitle("");
     setDescription("");
     setDueDate("");
+    setStatus("todo");
   };
 
   return (
@@ -45,6 +46,17 @@ const TaskForm = ({ onAddTask }) => {
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />
+          </FormControl>
+          <FormControl flex="1" mr={{ base: 0, md: 4 }} mb={{ base: 4, md: 0 }}>
+            <FormLabel>Status</FormLabel>
+            <Select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="todo">To Do</option>
+              <option value="inProgress">In Progress</option>
+              <option value="done">Done</option>
+            </Select>
           </FormControl>
           <Button type="submit" colorScheme="teal" mt={{ base: 4, md: 0 }}>
             Add Task
